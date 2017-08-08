@@ -21,6 +21,8 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+var ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -31,7 +33,7 @@ const publicPath = '/';
 const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
-
+const NOT_MES = /node_modules\/(?!@glomex\/fe\.mes\..+|mes-.+|co-.+|react-bootstrap-grid)/;
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
@@ -86,7 +88,7 @@ module.exports = {
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebookincubator/create-react-app/issues/253
-    modules: ['node_modules', paths.appNodeModules].concat(
+    modules: ['node_modules', paths.appNodeModules, paths.appSrc].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
       process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
     ),
@@ -96,7 +98,7 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
+    extensions: ['.js', '.json', '.jsx', '.styl', '.css'],
     alias: {
       // @remove-on-eject-begin
       // Resolve Babel runtime relative to react-scripts.
@@ -122,6 +124,9 @@ module.exports = {
   },
   module: {
     strictExportPresence: true,
+    noParse: function(content) {
+      return /node_modules\/google-libphonenumber\/dist/.test(content)
+    },
     rules: [
       // TODO: Disable require.ensure as it's not a standard language feature.
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
@@ -148,7 +153,8 @@ module.exports = {
             loader: require.resolve('eslint-loader'),
           },
         ],
-        include: paths.appSrc,
+        // include: paths.appSrc,
+        exclude: NOT_MES,
       },
       {
         // "oneOf" will traverse all following loaders until one will
@@ -169,18 +175,65 @@ module.exports = {
           // Process JS with Babel.
           {
             test: /\.(js|jsx)$/,
-            include: paths.appSrc,
+            // include: paths.appSrc,
+            exclude: NOT_MES,
             loader: require.resolve('babel-loader'),
             options: {
               // @remove-on-eject-begin
               babelrc: false,
-              presets: [require.resolve('babel-preset-react-app')],
+              presets: [
+                require.resolve('babel-preset-react-app'),
+                require.resolve('babel-preset-react'),
+                require.resolve('babel-preset-es2015'),
+                require.resolve('babel-preset-stage-0')
+              ],
+              plugins: [
+                require.resolve('babel-plugin-transform-decorators-legacy'),
+                require.resolve('babel-plugin-transform-runtime'),
+                require.resolve('babel-plugin-add-module-exports'),
+                require.resolve('babel-plugin-transform-react-display-name'),
+              ],
               // @remove-on-eject-end
               // This is a feature of `babel-loader` for webpack (not Babel itself).
               // It enables caching results in ./node_modules/.cache/babel-loader/
               // directory for faster rebuilds.
               cacheDirectory: true,
             },
+          },
+          {
+            test: /node_modules\/(vvs-.+)\.(jsx?)$/,
+            loader: require.resolve('babel-loader'),
+            options: {
+              cacheDirectory: true
+            }
+          },
+          {
+            test: /\.styl$/,
+            use: [
+              {
+                loader: require.resolve('style-loader'),
+                options: {
+                  singleton: true,
+                }
+              },
+              {
+                loader: 'css-loader',
+                options: {
+    							localIdentName: '[name]__[local]__[hash:base64:5]',
+    							sourceMap: true,
+                  '-autoprefixer': true
+                }
+              },
+              // {
+    					// 	loader: require.resolve('postcss-loader'),
+    					// },
+              {
+    						loader: require.resolve('stylus-loader'),
+    						options: {
+    							sourceMap: true
+    						}
+    					}
+            ],
           },
           // "postcss" loader applies autoprefixer to our CSS.
           // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -195,6 +248,10 @@ module.exports = {
                 loader: require.resolve('css-loader'),
                 options: {
                   importLoaders: 1,
+                  modules: true,
+                  localIdentName: '[name]__[local]__[hash:base64:5]',
+                  sourceMap: true,
+                  '-autoprefixer': true
                 },
               },
               {
@@ -274,6 +331,8 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new DuplicatePackageCheckerPlugin(),
+    new ProgressBarPlugin()
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
