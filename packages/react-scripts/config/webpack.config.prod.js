@@ -22,6 +22,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
+const NOT_MES = /node_modules\/(?!@glomex\/fe\.mes\..+|mes-.+|co-.+|react-bootstrap-grid)/;
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -53,7 +54,6 @@ const extractTextPluginOptions = shouldUseRelativeAssetPaths
   ? // Making sure that the publicPath goes back to to build folder.
     { publicPath: Array(cssFilename.split('/').length).join('../') }
   : {};
-
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
 // The development configuration is different and lives in a separate file.
@@ -86,7 +86,7 @@ module.exports = {
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebookincubator/create-react-app/issues/253
-    modules: ['node_modules', paths.appNodeModules].concat(
+    modules: ['node_modules', paths.appNodeModules, paths.appSrc].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
       process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
     ),
@@ -96,7 +96,7 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
+    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.css', '.styl'],
     alias: {
       // @remove-on-eject-begin
       // Resolve Babel runtime relative to react-scripts.
@@ -122,6 +122,9 @@ module.exports = {
   },
   module: {
     strictExportPresence: true,
+    noParse: function(content) {
+      return /node_modules\/google-libphonenumber\/dist/.test(content)
+    },
     rules: [
       // TODO: Disable require.ensure as it's not a standard language feature.
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
@@ -150,7 +153,8 @@ module.exports = {
             loader: require.resolve('eslint-loader'),
           },
         ],
-        include: paths.appSrc,
+        // include: paths.appSrc,
+        exclude: NOT_MES,
       },
       {
         // "oneOf" will traverse all following loaders until one will
@@ -170,16 +174,75 @@ module.exports = {
           // Process JS with Babel.
           {
             test: /\.(js|jsx)$/,
-            include: paths.appSrc,
+            // include: paths.appSrc,
+            exclude: NOT_MES,
             loader: require.resolve('babel-loader'),
             options: {
               // @remove-on-eject-begin
               babelrc: false,
-              presets: [require.resolve('babel-preset-react-app')],
+              presets: [
+                require.resolve('babel-preset-react-app'),
+                require.resolve('babel-preset-react'),
+                require.resolve('babel-preset-es2015'),
+                require.resolve('babel-preset-stage-0')
+              ],
+              plugins: [
+                require.resolve('babel-plugin-transform-decorators-legacy'),
+                require.resolve('babel-plugin-transform-runtime'),
+                require.resolve('babel-plugin-add-module-exports'),
+                require.resolve('babel-plugin-transform-react-display-name'),
+              ],
               // @remove-on-eject-end
+              // This is a feature of `babel-loader` for webpack (not Babel itself).
+              // It enables caching results in ./node_modules/.cache/babel-loader/
+              // directory for faster rebuilds.
               compact: true,
             },
           },
+          {
+    				test: /node_modules\/(vvs-.+)\.(jsx?)$/,
+    				loader: require.resolve('babel-loader')
+    			},
+          {
+            test: /\.styl$/,
+            loader: ExtractTextPlugin.extract(
+              Object.assign(
+                {
+                  fallback: require.resolve('style-loader'),
+                  use: [
+                    {
+                      loader: 'css-loader',
+                      options: {
+                        localIdentName: '[name]__[local]__[hash:base64:5]',
+                        // sourceMap: true,
+                        minimize: true,
+                        '-autoprefixer': true
+                      }
+                    },
+                    {
+                      loader: require.resolve('stylus-loader'),
+                      options: {
+                        sourceMap: true
+                      }
+                    }
+                  ]
+                },
+                extractTextPluginOptions
+              )
+            ),
+          },
+          // {
+          //   test: /\.(js|jsx)$/,
+          //   include: paths.appSrc,
+          //   loader: require.resolve('babel-loader'),
+          //   options: {
+          //     // @remove-on-eject-begin
+          //     babelrc: false,
+          //     presets: [require.resolve('babel-preset-react-app')],
+          //     // @remove-on-eject-end
+          //     compact: true,
+          //   },
+          // },
           // The notation here is somewhat confusing.
           // "postcss" loader applies autoprefixer to our CSS.
           // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -203,8 +266,11 @@ module.exports = {
                       loader: require.resolve('css-loader'),
                       options: {
                         importLoaders: 1,
+                        modules: true,
+                        localIdentName: '[name]__[local]__[hash:base64:5]',
                         minimize: true,
                         sourceMap: true,
+                        '-autoprefixer': true
                       },
                     },
                     {
@@ -261,7 +327,10 @@ module.exports = {
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     // In production, it will be an empty string unless you specify "homepage"
     // in `package.json`, in which case it will be the pathname of that URL.
-    new InterpolateHtmlPlugin(env.raw),
+    // new InterpolateHtmlPlugin(env.raw),
+    new InterpolateHtmlPlugin(Object.assign(env.raw, {
+      PUBLIC_URL: ''
+    })),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,
