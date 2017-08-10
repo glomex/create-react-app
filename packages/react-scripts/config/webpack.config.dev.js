@@ -219,20 +219,17 @@ module.exports = {
               {
                 loader: 'css-loader',
                 options: {
-    							localIdentName: '[name]__[local]__[hash:base64:5]',
-    							sourceMap: true,
+                localIdentName: '[name]__[local]__[hash:base64:5]',
+                sourceMap: true,
                   '-autoprefixer': true
                 }
               },
-              // {
-    					// 	loader: require.resolve('postcss-loader'),
-    					// },
               {
-    						loader: require.resolve('stylus-loader'),
-    						options: {
-    							sourceMap: true
-    						}
-    					}
+                loader: require.resolve('stylus-loader'),
+                options: {
+                  sourceMap: true
+                }
+              }
             ],
           },
           // "postcss" loader applies autoprefixer to our CSS.
