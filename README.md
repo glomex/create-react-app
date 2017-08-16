@@ -1,4 +1,8 @@
-# Create React App [![Build Status](https://travis-ci.org/facebookincubator/create-react-app.svg?branch=master)](https://travis-ci.org/facebookincubator/create-react-app)
+# Create React App (System:MES,Squad:content_owner,Type:Component)
+Tool for building portal and IAT
+
+## Build
+[![Build Status](https://travis-ci.org/facebookincubator/create-react-app.svg?branch=master)](https://travis-ci.org/facebookincubator/create-react-app)
 
 Create React apps with no build configuration.
 
