@@ -1,11 +1,9 @@
 // @remove-on-eject-begin
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 // @remove-on-eject-end
 'use strict';
@@ -30,6 +28,8 @@ const publicPath = paths.servedPath;
 // Some apps do not use client-side routing with pushState.
 // For these, "homepage" can be set to "." to enable relative asset paths.
 const shouldUseRelativeAssetPaths = publicPath === './';
+// Source maps are resource heavy and can cause out of memory issue for large source files.
+const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 // `publicUrl` is just like `publicPath`, but we will provide it to our app
 // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
 // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
@@ -62,7 +62,7 @@ module.exports = {
   bail: true,
   // We generate sourcemaps in production. This is slow but gives good results.
   // You can exclude the *.map files from the build during deployment.
-  devtool: 'source-map',
+  devtool: shouldUseSourceMap ? 'source-map' : false,
   // In production, we only want to load the polyfills and the app code.
   entry: [require.resolve('./polyfills'), paths.appIndexJs],
   output: {
@@ -133,7 +133,7 @@ module.exports = {
       // First, run the linter.
       // It's important to do this before Babel processes the JS.
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|mjs)$/,
         enforce: 'pre',
         use: [
           {
@@ -260,7 +260,12 @@ module.exports = {
             loader: ExtractTextPlugin.extract(
               Object.assign(
                 {
-                  fallback: require.resolve('style-loader'),
+                  fallback: {
+                    loader: require.resolve('style-loader'),
+                    options: {
+                      hmr: false,
+                    },
+                  },
                   use: [
                     {
                       loader: require.resolve('css-loader'),
@@ -269,8 +274,8 @@ module.exports = {
                         modules: true,
                         localIdentName: '[name]__[local]__[hash:base64:5]',
                         minimize: true,
-                        sourceMap: true,
                         '-autoprefixer': true
+                        sourceMap: shouldUseSourceMap,
                       },
                     },
                     {
@@ -304,7 +309,7 @@ module.exports = {
           },
           // "file" loader makes sure assets end up in the `build` folder.
           // When you `import` an asset, you get its filename.
-          // This loader don't uses a "test" so it will catch all modules
+          // This loader doesn't use a "test" so it will catch all modules
           // that fall through the other loaders.
           {
             loader: require.resolve('file-loader'),
@@ -365,13 +370,16 @@ module.exports = {
         // https://github.com/mishoo/UglifyJS2/issues/2011
         comparisons: false,
       },
+      mangle: {
+        safari10: true,
+      },        
       output: {
         comments: false,
         // Turned on because emoji and regex is not minified properly using default
         // https://github.com/facebookincubator/create-react-app/issues/2488
         ascii_only: true,
       },
-      sourceMap: true,
+      sourceMap: shouldUseSourceMap,
     }),
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
     new ExtractTextPlugin({
@@ -428,5 +436,6 @@ module.exports = {
     fs: 'empty',
     net: 'empty',
     tls: 'empty',
+    child_process: 'empty',
   },
 };
