@@ -26,20 +26,26 @@ module.exports = (resolve, rootDir, isEjecting) => {
     setupTestFrameworkScriptFile: setupTestsFile,
     testMatch: [
       '<rootDir>/src/**/__tests__/**/*.{js,jsx,mjs}',
-      '<rootDir>/src/**/?(*.)(spec|test).{js,jsx,mjs}',
+      '<rootDir>/src/**/?(*.)(spec|test).{js,jsx,mjs}'
     ],
     testEnvironment: 'node',
     testURL: 'http://localhost',
     transform: {
-      '^.+\\.(js|jsx|mjs)$': isEjecting
-        ? '<rootDir>/node_modules/babel-jest'
-        : resolve('config/jest/babelTransform.js'),
+      // '^.+\\.(js|jsx|mjs)$': isEjecting
+      //   ? '<rootDir>/node_modules/babel-jest'
+      //   : resolve('config/jest/babelTransform.js'),
+      // '^.+\\.(js|jsx|mjs)$': resolve('config/jest/babelTransform.js'),
+      '__mocks__/.+\\.(js|jsx)$': resolve('config/jest/babelTransform.js'),
+      'test/.+\\.(js|jsx)$': resolve('config/jest/babelTransform.js'),
+      'src/.+\\.(js|jsx)$': resolve('config/jest/babelTransform.js'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|mjs|css|json)$)': resolve(
         'config/jest/fileTransform.js'
       ),
     },
-    transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$'],
+    // transformIgnorePatterns: ['[/\\\\]node_modulesq[/\\\\].+\\.(js|jsx|mjs)$'],
+    transformIgnorePatterns: ['/node_modules\/(?!@glomex\/fe\.mes\..+|mes-.+|co-.+|react-bootstrap-grid)/'],
+    modulePaths: ['node_modules', paths.appNodeModules, paths.appSrc],
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
     },
