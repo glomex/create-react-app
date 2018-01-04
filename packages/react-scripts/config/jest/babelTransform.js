@@ -10,7 +10,6 @@
 const babelJest = require('babel-jest');
 
 module.exports = babelJest.createTransformer({
-  // exclude: /node_modules\/(?!@glomex\/fe\.mes\..+|mes-.+|co-.+|react-bootstrap-grid)/,
   presets: [
     require.resolve('babel-preset-react-app'),
     require.resolve('babel-preset-es2015'),
