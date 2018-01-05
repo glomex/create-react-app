@@ -48,6 +48,24 @@ switch (script) {
     process.exit(result.status);
     break;
   }
+  case 'lint': {
+    const results = spawn(
+      'node',
+      [
+        require.resolve('eslint/bin/eslint'),
+        '--config',
+        require.resolve('eslint-config-react-app'),
+        'src/**/*.{js,jsx}',
+      ],
+      { stdio: 'inherit' }
+    );
+
+    results.on('error', err => {
+      console.log('Error running ESLint: ' + err);
+      process.exit(results.status);
+    });
+    break;
+  }
   default:
     console.log('Unknown script "' + script + '".');
     console.log('Perhaps you need to update react-scripts?');
