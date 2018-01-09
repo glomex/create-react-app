@@ -214,16 +214,24 @@ module.exports = {
                       loader: 'css-loader',
                       options: {
                         localIdentName: '[name]__[local]__[hash:base64:5]',
-                        // sourceMap: true,
                         minimize: true,
                         '-autoprefixer': true
                       }
                     },
                     {
-                      loader: require.resolve('stylus-loader'),
+                      loader: require.resolve('postcss-loader'),
                       options: {
-                        sourceMap: true
-                      }
+                        // Necessary for external CSS imports to work
+                        // https://github.com/facebookincubator/create-react-app/issues/2677
+                        ident: 'postcss',
+                        plugins: () => [
+                          require('postcss-flexbugs-fixes'),
+                          require('postcss-cssnext')()
+                        ],
+                      },
+                    },
+                    {
+                      loader: require.resolve('stylus-loader')
                     }
                   ]
                 },
@@ -274,7 +282,6 @@ module.exports = {
                         modules: true,
                         localIdentName: '[name]__[local]__[hash:base64:5]',
                         minimize: true,
-                        '-autoprefixer': true,
                         sourceMap: shouldUseSourceMap,
                       },
                     },
@@ -286,17 +293,7 @@ module.exports = {
                         ident: 'postcss',
                         plugins: () => [
                           require('postcss-flexbugs-fixes'),
-                          require('postcss-cssnext')(),
-                          require('postcss-apply')(),
-                          autoprefixer({
-                            browsers: [
-                              '>1%',
-                              'last 4 versions',
-                              'Firefox ESR',
-                              'not ie < 9', // React doesn't support IE8 anyway
-                            ],
-                            flexbox: 'no-2009',
-                          }),
+                          require('postcss-cssnext')()
                         ],
                       },
                     },
