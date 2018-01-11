@@ -206,12 +206,7 @@ module.exports = {
           {
             test: /\.styl$/,
             use: [
-              {
-                loader: require.resolve('style-loader'),
-                options: {
-                  singleton: true,
-                }
-              },
+              require.resolve('style-loader'),
               {
                 loader: 'css-loader',
                 options: {
@@ -228,8 +223,16 @@ module.exports = {
                   sourceMap: true,
                   plugins: () => [
                     require('postcss-flexbugs-fixes'),
-                    require('postcss-cssnext')()
-                  ],
+                    require('postcss-cssnext')({
+                      browsers: [
+                        '>1%',
+                        'last 4 versions',
+                        'Firefox ESR',
+                        'IE > 10'
+                      ],
+                    }),
+                    require('postcss-apply')()
+                  ]
                 },
               },
               {
@@ -255,7 +258,7 @@ module.exports = {
                   importLoaders: 1,
                   modules: true,
                   localIdentName: '[name]__[local]__[hash:base64:5]',
-                  sourceMap: true
+                  sourceMap: true,
                 },
               },
               {
@@ -267,7 +270,15 @@ module.exports = {
                   sourceMap: true,
                   plugins: () => [
                     require('postcss-flexbugs-fixes'),
-                    require('postcss-cssnext')()
+                    require('postcss-cssnext')({
+                      browsers: [
+                        '>1%',
+                        'last 4 versions',
+                        'Firefox ESR',
+                        'IE > 10'
+                      ],
+                    }),
+                    require('postcss-apply')()
                   ],
                 },
               },

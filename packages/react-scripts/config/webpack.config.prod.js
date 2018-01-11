@@ -214,8 +214,7 @@ module.exports = {
                       loader: 'css-loader',
                       options: {
                         localIdentName: '[name]__[local]__[hash:base64:5]',
-                        minimize: true,
-                        '-autoprefixer': true
+                        minimize: true
                       }
                     },
                     {
@@ -226,8 +225,16 @@ module.exports = {
                         ident: 'postcss',
                         plugins: () => [
                           require('postcss-flexbugs-fixes'),
-                          require('postcss-cssnext')()
-                        ],
+                          require('postcss-cssnext')({
+                            browsers: [
+                              '>1%',
+                              'last 4 versions',
+                              'Firefox ESR',
+                              'IE > 10'
+                            ],
+                          }),
+                          require('postcss-apply')()
+                        ]
                       },
                     },
                     {
@@ -293,8 +300,16 @@ module.exports = {
                         ident: 'postcss',
                         plugins: () => [
                           require('postcss-flexbugs-fixes'),
-                          require('postcss-cssnext')()
-                        ],
+                          require('postcss-cssnext')({
+                            browsers: [
+                              '>1%',
+                              'last 4 versions',
+                              'Firefox ESR',
+                              'IE > 10'
+                            ],
+                          }),
+                          require('postcss-apply')()
+                        ]
                       },
                     },
                   ],
