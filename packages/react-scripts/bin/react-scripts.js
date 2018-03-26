@@ -80,14 +80,14 @@ switch (script) {
   case 'bump': {
     const results = spawn.sync(
       'node',
-      [
+      nodeArgs.concat([
         require.resolve('version-bump-prompt/bin/bump'),
         '--commit=" [ci skip]"',
         '--tag',
         '--push',
         '--all',
         '--patch'
-      ],
+      ]),
       { stdio: 'inherit' }
     );
     process.exit(results.status);
