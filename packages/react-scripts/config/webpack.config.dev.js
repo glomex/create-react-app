@@ -107,7 +107,9 @@ module.exports = {
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
       react: path.join(paths.appNodeModules, 'react'),
-      'react-dom': path.join(paths.appNodeModules, 'react-dom')
+      'react-dom': path.join(paths.appNodeModules, 'react-dom'),
+      '@glomex/fe.mes.curated-playlists': path.join(paths.appNodeModules, '@glomex/fe.mes.curated-playlists'),
+      '@glomex/fe.mes.videos': path.join(paths.appNodeModules, '@glomex/fe.mes.videos')
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
