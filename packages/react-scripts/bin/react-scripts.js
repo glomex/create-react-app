@@ -82,7 +82,7 @@ switch (script) {
       'node',
       nodeArgs.concat([
         require.resolve('version-bump-prompt/bin/bump'),
-        '--commit=" [ci skip]"',
+        '--commit= [ci skip]',
         '--tag',
         '--push',
         '--all',
