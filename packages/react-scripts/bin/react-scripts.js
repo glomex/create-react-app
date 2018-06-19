@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  *
@@ -64,6 +65,32 @@ switch (script) {
       console.log('Error running ESLint: ' + err);
       process.exit(results.status);
     });
+    break;
+  }
+  case 'validate': {
+    const result = spawn.sync(
+      'node',
+      nodeArgs
+        .concat(require.resolve('../scripts/' + script)),
+      { stdio: 'inherit' }
+    );
+    process.exit(result.status);
+    break;
+  }
+  case 'bump': {
+    const results = spawn.sync(
+      'node',
+      nodeArgs.concat([
+        require.resolve('version-bump-prompt/bin/bump'),
+        '--commit= [ci skip]',
+        '--tag',
+        '--push',
+        '--all',
+        '--patch'
+      ]),
+      { stdio: 'inherit' }
+    );
+    process.exit(results.status);
     break;
   }
   default:
