@@ -198,12 +198,38 @@ module.exports = {
               cacheDirectory: true,
             },
           },
+          // {
+          //   test: /node_modules\/(vvs-.+)\.(jsx?)$/,
+          //   loader: require.resolve('babel-loader'),
+          //   options: {
+          //     cacheDirectory: true
+          //   }
+          // },
           {
-            test: /node_modules\/(vvs-.+)\.(jsx?)$/,
+            test: /node_modules\/(@glomex\/vvs-.+)\.(jsx?)$/,
+            // include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              cacheDirectory: true
-            }
+              // @remove-on-eject-begin
+              babelrc: false,
+              presets: [
+                require.resolve('babel-preset-react-app'),
+                // require.resolve('babel-preset-react'),
+                require.resolve('babel-preset-es2015'),
+                require.resolve('babel-preset-stage-0')
+              ],
+              plugins: [
+                require.resolve('babel-plugin-transform-decorators-legacy'),
+                require.resolve('babel-plugin-transform-runtime'),
+                require.resolve('babel-plugin-add-module-exports'),
+                require.resolve('babel-plugin-transform-react-display-name'),
+              ],
+              // @remove-on-eject-end
+              // This is a feature of `babel-loader` for webpack (not Babel itself).
+              // It enables caching results in ./node_modules/.cache/babel-loader/
+              // directory for faster rebuilds.
+              cacheDirectory: true,
+            },
           },
           {
             test: /\.styl$/,
