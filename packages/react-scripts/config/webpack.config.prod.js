@@ -200,9 +200,33 @@ module.exports = {
             },
           },
           {
-    				test: /node_modules\/(vvs-.+)\.(jsx?)$/,
-    				loader: require.resolve('babel-loader')
-    			},
+            test: /node_modules\/(vvs-.+)\.(jsx?)$/,
+            loader: require.resolve('babel-loader')
+          },
+          {
+            test: /node_modules\/(@glomex\/vvs-.+)\.(jsx?)$/,
+            loader: require.resolve('babel-loader'),
+            options: {
+              // @remove-on-eject-begin
+              babelrc: false,
+              presets: [
+                require.resolve('babel-preset-react-app'),
+                // require.resolve('babel-preset-react'),
+                require.resolve('babel-preset-es2015'),
+                require.resolve('babel-preset-stage-0')
+              ],
+              plugins: [
+                require.resolve('babel-plugin-transform-decorators-legacy'),
+                require.resolve('babel-plugin-transform-runtime'),
+                require.resolve('babel-plugin-add-module-exports'),
+                require.resolve('babel-plugin-transform-react-display-name'),
+              ],
+              // @remove-on-eject-end
+              // This is a feature of `babel-loader` for webpack (not Babel itself).
+              // It enables caching results in ./node_modules/.cache/babel-loader/
+              // directory for faster rebuilds.
+            },
+          },
           {
             test: /\.styl$/,
             loader: ExtractTextPlugin.extract(
@@ -396,7 +420,8 @@ module.exports = {
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
     new ExtractTextPlugin({
       filename: cssFilename,
-      allChunks: true
+      allChunks: true,
+      ignoreOrder: true
     }),
     // Generate a manifest file which contains a mapping of all asset filenames
     // to their corresponding output file so that tools can pick it up without

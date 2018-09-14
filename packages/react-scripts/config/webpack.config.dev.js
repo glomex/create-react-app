@@ -198,16 +198,15 @@ module.exports = {
               cacheDirectory: true,
             },
           },
-          // {
-          //   test: /node_modules\/(vvs-.+)\.(jsx?)$/,
-          //   loader: require.resolve('babel-loader'),
-          //   options: {
-          //     cacheDirectory: true
-          //   }
-          // },
+          {
+            test: /node_modules\/(vvs-.+)\.(jsx?)$/,
+            loader: require.resolve('babel-loader'),
+            options: {
+              cacheDirectory: true
+            }
+          },
           {
             test: /node_modules\/(@glomex\/vvs-.+)\.(jsx?)$/,
-            // include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
               // @remove-on-eject-begin
