@@ -1,6 +1,6 @@
 {
   "name": "@glomex/glomex-react-scripts",
-  "version": "1.0.50-rc.1",
+  "version": "1.0.51",
   "description": "Configuration and scripts for Create React App.",
   "repository": "facebookincubator/create-react-app",
   "license": "MIT",
