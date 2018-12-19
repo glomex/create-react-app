@@ -39,24 +39,24 @@ module.exports = (resolve, rootDir, isEjecting) => {
 
     setupTestFrameworkScriptFile: setupTestsFile,
     testMatch: [
-      '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
-      '<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}',
+      '<rootDir>/src/**/__tests__/**/*.{js,jsx,mjs}',
+      '<rootDir>/src/**/?(*.)(spec|test).{js,jsx,mjs}',
     ],
     testEnvironment: 'jsdom',
     testURL: 'http://localhost',
     transform: {
-      '^.+\\.(js|jsx|ts|tsx)$': isEjecting
-        ? '<rootDir>/node_modules/babel-jest'
-        : resolve('config/jest/babelTransform.js'),
+      '__mocks__/.+\\.(js|jsx)$': resolve('config/jest/babelTransform.js'),
+      'test/.+\\.(js|jsx)$': resolve('config/jest/babelTransform.js'),
+      'src/.+\\.(js|jsx)$': resolve('config/jest/babelTransform.js'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
         'config/jest/fileTransform.js'
       ),
     },
     transformIgnorePatterns: [
-      '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
-      '^.+\\.module\\.(css|sass|scss)$',
+      '/node_modules/(?!@glomex/fe.mes..+|mes-.+|co-.+|react-bootstrap-grid)/',
     ],
+    modulePaths: ['node_modules', paths.appNodeModules, paths.appSrc],
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',

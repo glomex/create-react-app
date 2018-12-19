@@ -46,9 +46,7 @@ const useTypeScript = fs.existsSync(paths.appTsConfig);
 
 // style files regexes
 const cssRegex = /\.css$/;
-const cssModuleRegex = /\.module\.css$/;
-const sassRegex = /\.(scss|sass)$/;
-const sassModuleRegex = /\.module\.(scss|sass)$/;
+const stylRegex = /\.styl$/;
 
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
@@ -106,6 +104,9 @@ module.exports = function(webpackEnv) {
                 flexbox: 'no-2009',
               },
               stage: 3,
+              features: {
+                'nesting-rules': true,
+              },
             }),
           ],
           sourceMap: isEnvProduction && shouldUseSourceMap,
@@ -258,7 +259,7 @@ module.exports = function(webpackEnv) {
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
       // https://github.com/facebook/create-react-app/issues/253
-      modules: ['node_modules'].concat(
+      modules: ['node_modules', paths.appNodeModules, paths.appSrc].concat(
         // It is guaranteed to exist because we tweak it in `env.js`
         process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
       ),
@@ -275,6 +276,9 @@ module.exports = function(webpackEnv) {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
+        react: path.join(paths.appNodeModules, 'react'),
+        'react-dom': path.join(paths.appNodeModules, 'react-dom'),
+        redux: path.join(paths.appNodeModules, 'redux'),
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -345,7 +349,7 @@ module.exports = function(webpackEnv) {
             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
-              include: paths.appSrc,
+              include: [paths.appSrc, /\/(@?glomex|packages)\/[^\/]+\/src/],
               loader: require.resolve('babel-loader'),
               options: {
                 customize: require.resolve(
@@ -384,6 +388,19 @@ module.exports = function(webpackEnv) {
                       },
                     },
                   ],
+                  [
+                    require.resolve('@babel/plugin-proposal-decorators'),
+                    { legacy: true },
+                  ],
+                  [
+                    require.resolve('@babel/plugin-proposal-class-properties'),
+                    { loose: true },
+                  ],
+                  require.resolve('@babel/plugin-proposal-export-default-from'),
+                  require.resolve(
+                    '@babel/plugin-proposal-export-namespace-from'
+                  ),
+                  require.resolve('babel-plugin-add-module-exports'),
                 ],
                 // This is a feature of `babel-loader` for webpack (not Babel itself).
                 // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -437,24 +454,8 @@ module.exports = function(webpackEnv) {
             // In production, we use MiniCSSExtractPlugin to extract that CSS
             // to a file, but in development "style" loader enables hot editing
             // of CSS.
-            // By default we support CSS Modules with the extension .module.css
             {
               test: cssRegex,
-              exclude: cssModuleRegex,
-              use: getStyleLoaders({
-                importLoaders: 1,
-                sourceMap: isEnvProduction && shouldUseSourceMap,
-              }),
-              // Don't consider CSS imports dead code even if the
-              // containing package claims to have no side effects.
-              // Remove this when webpack adds a warning or an error for this.
-              // See https://github.com/webpack/webpack/issues/6571
-              sideEffects: true,
-            },
-            // Adds support for CSS Modules (https://github.com/css-modules/css-modules)
-            // using the extension .module.css
-            {
-              test: cssModuleRegex,
               use: getStyleLoaders({
                 importLoaders: 1,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
@@ -462,37 +463,17 @@ module.exports = function(webpackEnv) {
                 getLocalIdent: getCSSModuleLocalIdent,
               }),
             },
-            // Opt-in support for SASS (using .scss or .sass extensions).
-            // By default we support SASS Modules with the
-            // extensions .module.scss or .module.sass
+            // Add stylus support for mes-portal styles
             {
-              test: sassRegex,
-              exclude: sassModuleRegex,
+              test: stylRegex,
               use: getStyleLoaders(
                 {
                   importLoaders: 2,
                   sourceMap: isEnvProduction && shouldUseSourceMap,
+                  // modules: true,
+                  // getLocalIdent: getCSSModuleLocalIdent,
                 },
-                'sass-loader'
-              ),
-              // Don't consider CSS imports dead code even if the
-              // containing package claims to have no side effects.
-              // Remove this when webpack adds a warning or an error for this.
-              // See https://github.com/webpack/webpack/issues/6571
-              sideEffects: true,
-            },
-            // Adds support for CSS Modules, but using SASS
-            // using the extension .module.scss or .module.sass
-            {
-              test: sassModuleRegex,
-              use: getStyleLoaders(
-                {
-                  importLoaders: 2,
-                  sourceMap: isEnvProduction && shouldUseSourceMap,
-                  modules: true,
-                  getLocalIdent: getCSSModuleLocalIdent,
-                },
-                'sass-loader'
+                'stylus-loader'
               ),
             },
             // "file" loader makes sure those assets get served by WebpackDevServer.
