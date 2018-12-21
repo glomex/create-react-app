@@ -1,6 +1,6 @@
 {
   "name": "@glomex/glomex-react-scripts",
-  "version": "1.0.52-rc.4",
+  "version": "1.0.52-rc.5",
   "description": "Configuration and scripts for Create React App.",
   "repository": "facebook/create-react-app",
   "license": "MIT",
@@ -25,6 +25,7 @@
   "types": "./lib/react-app.d.ts",
   "dependencies": {
     "@babel/core": "7.1.6",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "@babel/plugin-proposal-export-namespace-from": "^7.2.0",
     "@babel/plugin-proposal-decorators": "^7.1.6",
