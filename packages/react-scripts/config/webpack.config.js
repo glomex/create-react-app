@@ -400,7 +400,6 @@ module.exports = function(webpackEnv) {
                   require.resolve(
                     '@babel/plugin-proposal-export-namespace-from'
                   ),
-                  require.resolve('babel-plugin-add-module-exports'),
                 ],
                 // This is a feature of `babel-loader` for webpack (not Babel itself).
                 // It enables caching results in ./node_modules/.cache/babel-loader/

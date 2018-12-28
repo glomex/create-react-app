@@ -20,6 +20,5 @@ module.exports = babelJest.createTransformer({
     ],
     require.resolve('@babel/plugin-proposal-export-default-from'),
     require.resolve('@babel/plugin-proposal-export-namespace-from'),
-    require.resolve('babel-plugin-add-module-exports'),
   ],
 });
