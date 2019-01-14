@@ -1,6 +1,6 @@
 {
   "name": "@glomex/glomex-react-scripts",
-  "version": "1.0.52-rc.9",
+  "version": "1.0.52-rc.10",
   "description": "Configuration and scripts for Create React App.",
   "repository": "facebook/create-react-app",
   "license": "MIT",
@@ -68,8 +68,6 @@
     "react-dev-utils": "^6.1.1",
     "resolve": "1.8.1",
     "style-loader": "0.23.0",
-    "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.2",
     "terser-webpack-plugin": "1.1.0",
     "url-loader": "1.1.1",
     "version-bump-prompt": "^4.2.2",
