@@ -43,6 +43,7 @@ const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
 
 // Check if TypeScript is setup
 const useTypeScript = fs.existsSync(paths.appTsConfig);
+const useThemeMap = fs.existsSync(paths.themeFile);
 
 const cssRegex = /\.css$/;
 
@@ -95,18 +96,24 @@ module.exports = function(webpackEnv) {
           // Necessary for external CSS imports to work
           // https://github.com/facebook/create-react-app/issues/2677
           ident: 'postcss',
-          plugins: () => [
-            require('postcss-flexbugs-fixes'),
-            require('postcss-preset-env')({
-              autoprefixer: {
-                flexbox: 'no-2009',
-              },
-              stage: 3,
-              features: {
-                'nesting-rules': true,
-              },
-            }),
-          ],
+          plugins: () =>
+            [
+              useThemeMap &&
+                require('postcss-map')({
+                  maps: [require(paths.themeFile)],
+                }),
+              require('postcss-flexbugs-fixes'),
+              require('postcss-preset-env')({
+                autoprefixer: {
+                  flexbox: 'no-2009',
+                },
+                stage: 3,
+                features: {
+                  'nesting-rules': true,
+                },
+              }),
+              require('postcss-calc')(),
+            ].filter(Boolean),
           sourceMap: isEnvProduction && shouldUseSourceMap,
         },
       },
